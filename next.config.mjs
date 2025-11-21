@@ -6,6 +6,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  reactStrictMode: true, // optional, helps catch issues
 }
 
 export default nextConfig
