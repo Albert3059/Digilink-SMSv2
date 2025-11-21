@@ -12,23 +12,12 @@ frontend:
         # Build Next.js app
         - pnpm run build
   artifacts:
-    # Output directory for Next.js SSR
+    # Output directory for Amplify hosting
     baseDirectory: .next
     files:
       - '**/*'
   cache:
     paths:
-      # Cache node_modules for faster builds
+      # Cache node_modules and Next.js cache
       - node_modules/**/*
-      # Cache Next.js build cache
       - .next/cache/**/*
-  customHeaders:
-    # Optional: add headers for security / caching
-    - pattern: '**/*'
-      headers:
-        - key: X-Frame-Options
-          value: DENY
-        - key: X-XSS-Protection
-          value: 1; mode=block
-        - key: X-Content-Type-Options
-          value: nosniff
