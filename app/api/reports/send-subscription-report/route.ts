@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import Resend from "resend"
+import { getResend } from '../../../../lib/resend'
 
 export async function POST(request: Request) {
   try {
@@ -22,7 +22,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Admin email is required" }, { status: 400 })
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY)
+    const resend = getResend()
+    if (!resend) {
+      console.error("[v0] RESEND_API_KEY is not configured (getResend returned null)")
+      return NextResponse.json({ error: "Email service not configured" }, { status: 500 })
+    }
 
     console.log("[v0] Preparing report for:", adminEmail)
 
@@ -171,31 +175,23 @@ export async function POST(request: Request) {
     console.log("[v0] Sending email to:", adminEmail)
 
     try {
-      const { data, error } = await resend.emails.send({
+      const result = await resend.emails.send({
         from: "Digilink IT Solutions <info@digilinkict.co.za>",
         to: adminEmail,
         subject: `Subscription Report - ${new Date().toLocaleDateString()}`,
         html: reportHtml,
       })
 
-      if (error) {
-        console.error("[v0] Resend API error:", error)
-        return NextResponse.json(
-          { error: `Failed to send email: ${error.message || "Unknown error"}` },
-          { status: 500 },
-        )
-      }
-
-      console.log("[v0] Email sent successfully:", data?.id)
+      console.log("[v0] Email sent successfully:", (result as any)?.id)
 
       return NextResponse.json({
         message: "Report sent successfully",
-        emailId: data?.id,
+        emailId: (result as any)?.id,
       })
     } catch (emailError: any) {
       console.error("[v0] Exception sending email:", emailError)
       return NextResponse.json(
-        { error: `Email service error: ${emailError.message || "Unknown error"}` },
+        { error: `Email service error: ${emailError?.message || "Unknown error"}` },
         { status: 500 },
       )
     }
