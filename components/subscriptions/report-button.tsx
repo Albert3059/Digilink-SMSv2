@@ -18,7 +18,7 @@ export default function ReportButton({ subscriptions = [], adminEmail, companyNa
       setSending(true)
       console.log("[v0] Sending report with", subscriptions.length, "subscriptions")
 
-      const response = await fetch("/api/reports/send-subscription-report", {
+      const response = await fetch("/api/send-subscription-report", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

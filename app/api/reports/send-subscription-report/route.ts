@@ -28,6 +28,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email service not configured" }, { status: 500 })
     }
 
+    // Log presence (but never log the full secret). This helps verify the function
+    // environment at runtime without exposing the key in plaintext.
+    try {
+      const present = !!process.env.RESEND_API_KEY
+      const len = process.env.RESEND_API_KEY ? process.env.RESEND_API_KEY.length : 0
+      console.log(`[v0] RESEND_API_KEY present: ${present} (length=${len})`)
+    } catch (e) {
+      console.log('[v0] Unable to read RESEND_API_KEY at runtime')
+    }
+
     console.log("[v0] Preparing report for:", adminEmail)
 
     // Calculate statistics
